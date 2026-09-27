@@ -1,0 +1,230 @@
+.doctor-prescription-page {
+    padding: 28px;
+    min-height: calc(100vh - 70px);
+    background: #f8fafc;
+}
+
+.doctor-prescription-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.doctor-prescription-header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #0f172a;
+}
+
+.doctor-prescription-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+}
+
+.prescription-title-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prescription-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-section {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.form-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 20px;
+    font-size: 18px;
+    color: #0f172a;
+}
+
+.form-section h2 svg {
+    color: #2563eb;
+}
+
+.form-section label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    padding: 11px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #0f172a;
+    outline: none;
+    background: white;
+}
+
+.form-section input:focus,
+.form-section select:focus,
+.form-section textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-section textarea {
+    resize: vertical;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.form-grid label {
+    margin-bottom: 0;
+}
+
+.medicine-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.medicine-heading h2 {
+    margin: 0;
+}
+
+.add-medicine-button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.add-medicine-button:hover {
+    background: #1d4ed8;
+}
+
+.medicine-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.medicine-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    background: #f8fafc;
+}
+
+.medicine-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    color: #334155;
+}
+
+.remove-medicine-button {
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.remove-medicine-button:hover {
+    background: #fecaca;
+}
+
+.prescription-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 20px;
+}
+
+.save-prescription-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: #16a34a;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 9px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.save-prescription-button:hover {
+    background: #15803d;
+}
+
+@media (max-width: 700px) {
+    .doctor-prescription-page {
+        padding: 18px;
+    }
+
+    .doctor-prescription-header {
+        align-items: flex-start;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .medicine-heading {
+        align-items: flex-start;
+        gap: 12px;
+        flex-direction: column;
+    }
+
+    .add-medicine-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .prescription-actions {
+        justify-content: stretch;
+    }
+
+    .save-prescription-button {
+        width: 100%;
+        justify-content: center;
+    }
+}

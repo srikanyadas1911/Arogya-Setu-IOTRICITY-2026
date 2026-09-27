@@ -1,0 +1,158 @@
+.doctor-history-page {
+    padding: 28px;
+    min-height: calc(100vh - 70px);
+    background: #f8fafc;
+}
+
+.doctor-history-header {
+    margin-bottom: 24px;
+}
+
+.doctor-history-header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #0f172a;
+}
+
+.doctor-history-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+}
+
+.history-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    max-width: 500px;
+    margin-bottom: 24px;
+    color: #64748b;
+}
+
+.history-search input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.history-search input::placeholder {
+    color: #94a3b8;
+}
+
+.history-list {
+    display: grid;
+    gap: 16px;
+}
+
+.history-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.5fr auto;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.history-patient {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.history-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-patient h3 {
+    margin: 0 0 4px;
+    color: #0f172a;
+    font-size: 16px;
+}
+
+.history-patient span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.history-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-details div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+    font-size: 14px;
+}
+
+.history-details svg {
+    color: #2563eb;
+}
+
+.history-notes {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.view-history-button {
+    border: 1px solid #2563eb;
+    background: white;
+    color: #2563eb;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.view-history-button:hover {
+    background: #eff6ff;
+}
+
+@media (max-width: 1000px) {
+    .history-card {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .history-notes {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .doctor-history-page {
+        padding: 18px;
+    }
+
+    .history-card {
+        grid-template-columns: 1fr;
+    }
+
+    .history-notes {
+        grid-column: auto;
+    }
+
+    .view-history-button {
+        width: 100%;
+    }
+}

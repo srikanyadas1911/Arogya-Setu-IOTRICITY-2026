@@ -1,0 +1,348 @@
+.upload-prescription-page {
+    min-height: 100%;
+    padding: 28px;
+    background: #f8fafc;
+}
+
+/* Header */
+
+.upload-header {
+    margin-bottom: 24px;
+}
+
+.upload-header h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 28px;
+}
+
+.upload-header p {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Main Upload Card */
+
+.upload-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+/* Drop Zone */
+
+.upload-drop-zone {
+    min-height: 360px;
+    border: 2px dashed #bfdbfe;
+    border-radius: 16px;
+    background: #f8fbff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.upload-drop-zone:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.upload-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.upload-drop-zone h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+}
+
+.upload-drop-zone p {
+    margin: 8px 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.upload-drop-zone>span {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* Choose File */
+
+.choose-file-button {
+    margin-top: 20px;
+    height: 42px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.choose-file-button:hover {
+    background: #1d4ed8;
+}
+
+/* Selected File */
+
+.selected-file-section {
+    max-width: 650px;
+    margin: 40px auto;
+}
+
+.selected-file {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+.file-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-details strong {
+    display: block;
+    color: #0f172a;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.file-details span {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.remove-file-button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 9px;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.remove-file-button:hover {
+    background: #fecaca;
+}
+
+/* Upload Button */
+
+.upload-button {
+    width: 100%;
+    height: 46px;
+    margin-top: 16px;
+    border: none;
+    border-radius: 11px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.upload-button:hover {
+    background: #1d4ed8;
+}
+
+/* Success */
+
+.upload-success {
+    min-height: 330px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.success-icon {
+    color: #16a34a;
+    margin-bottom: 16px;
+}
+
+.upload-success h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+}
+
+.upload-success p {
+    max-width: 450px;
+    margin: 8px 0 20px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.upload-another-button {
+    height: 42px;
+    padding: 0 18px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.upload-another-button:hover {
+    background: #dbeafe;
+}
+
+/* Security */
+
+.upload-security {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    margin-top: 20px;
+    padding: 18px;
+    border: 1px solid #bbf7d0;
+    border-radius: 15px;
+    background: #f0fdf4;
+}
+
+.security-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #dcfce7;
+    color: #15803d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-security strong {
+    display: block;
+    color: #166534;
+    font-size: 14px;
+}
+
+.upload-security p {
+    margin: 5px 0 0;
+    color: #15803d;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Tips */
+
+.upload-tips {
+    margin-top: 22px;
+}
+
+.upload-tips h2 {
+    margin: 0 0 13px;
+    color: #0f172a;
+    font-size: 17px;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    background: white;
+    color: #2563eb;
+}
+
+.tip span {
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Tablet */
+
+@media (max-width: 800px) {
+    .upload-prescription-page {
+        padding: 20px;
+    }
+
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+    .upload-prescription-page {
+        padding: 16px;
+    }
+
+    .upload-card {
+        padding: 16px;
+    }
+
+    .upload-drop-zone {
+        min-height: 300px;
+        padding: 20px;
+    }
+
+    .selected-file {
+        align-items: flex-start;
+    }
+
+    .upload-security {
+        align-items: flex-start;
+    }
+}

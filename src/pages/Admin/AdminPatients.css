@@ -1,0 +1,131 @@
+.admin-patients-page {
+    padding: 24px;
+}
+
+.admin-patients-header {
+    margin-bottom: 24px;
+}
+
+.admin-patients-header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #1f2937;
+}
+
+.admin-patients-header p {
+    margin-top: 6px;
+    color: #6b7280;
+}
+
+.patient-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.patient-search input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+}
+
+.admin-patients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.admin-patient-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.admin-patient-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
+.admin-patient-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.admin-patient-info h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+}
+
+.admin-patient-info p {
+    margin: 0 0 3px;
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.admin-patient-info span {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.patient-status {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.patient-status.active {
+    color: #16a34a;
+}
+
+.patient-status.inactive {
+    color: #dc2626;
+}
+
+.view-patient-button {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.view-patient-button:hover {
+    background: #dbeafe;
+}
+
+.no-patients {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .admin-patient-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .view-patient-button {
+        width: 100%;
+    }
+}

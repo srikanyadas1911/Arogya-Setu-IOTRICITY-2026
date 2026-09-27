@@ -1,0 +1,213 @@
+.admin-appointments-page {
+    padding: 24px;
+    background: #f8fafc;
+    min-height: 100%;
+}
+
+/* Header */
+
+.admin-appointments-header {
+    margin-bottom: 24px;
+}
+
+.admin-appointments-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.admin-appointments-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* Appointment List */
+
+.admin-appointments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+/* Appointment Card */
+
+.admin-appointment-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px;
+    transition: 0.2s ease;
+}
+
+.admin-appointment-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+
+/* Patient + Doctor */
+
+.appointment-people {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 18px;
+}
+
+.appointment-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 220px;
+}
+
+.appointment-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Patient Icon */
+
+.appointment-icon.patient {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+
+/* Doctor Icon */
+
+.appointment-icon.doctor {
+    background: #ecfdf5;
+    color: #16a34a;
+}
+
+
+/* Person Text */
+
+.appointment-person span {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 3px;
+}
+
+.appointment-person h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+/* Appointment Details */
+
+.appointment-details {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+
+    padding-top: 15px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.appointment-details>div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #4b5563;
+    font-size: 13px;
+}
+
+
+/* Appointment Type */
+
+.appointment-type {
+    padding: 5px 10px;
+    border-radius: 6px;
+
+    background: #f8fafc;
+    color: #475569;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* Status */
+
+.appointment-status {
+    margin-top: 14px;
+
+    display: inline-block;
+
+    padding: 5px 11px;
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* Confirmed */
+
+.appointment-status.confirmed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
+/* Pending */
+
+.appointment-status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+
+/* Completed */
+
+.appointment-status.completed {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .admin-appointments-page {
+        padding: 16px;
+    }
+
+    .admin-appointments-header h1 {
+        font-size: 24px;
+    }
+
+    .appointment-people {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .appointment-person {
+        min-width: 0;
+    }
+
+    .appointment-details {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .appointment-type {
+        margin-top: 4px;
+    }
+}

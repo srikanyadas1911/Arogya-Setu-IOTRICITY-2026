@@ -1,0 +1,151 @@
+.doctor-patients-page {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.doctor-patients-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.doctor-patients-header h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 28px;
+}
+
+.doctor-patients-header p {
+    margin: 8px 0 0;
+    color: #64748b;
+}
+
+.patient-count {
+    padding: 10px 16px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.patient-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 420px;
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.patient-search svg {
+    color: #64748b;
+}
+
+.patient-search input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.patients-table {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.patients-table-header,
+.patient-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1.4fr 1.2fr 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 22px;
+}
+
+.patients-table-header {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.patient-row {
+    border-top: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 14px;
+}
+
+.patient-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #0f172a;
+}
+
+.patient-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 50%;
+}
+
+.patient-phone,
+.patient-visit {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.patient-phone svg,
+.patient-visit svg {
+    color: #2563eb;
+}
+
+.view-patient-button {
+    border: none;
+    padding: 9px 14px;
+    background: #2563eb;
+    color: white;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.view-patient-button:hover {
+    background: #1d4ed8;
+}
+
+@media (max-width: 1000px) {
+    .patients-table {
+        overflow-x: auto;
+    }
+
+    .patients-table-header,
+    .patient-row {
+        min-width: 850px;
+    }
+}
+
+@media (max-width: 600px) {
+    .doctor-patients-page {
+        padding: 20px;
+    }
+
+    .doctor-patients-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+}
