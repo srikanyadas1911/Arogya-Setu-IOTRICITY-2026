@@ -35,7 +35,6 @@ import AdminPatients from './pages/Admin/AdminPatients';
 import AdminVerification from './pages/Admin/AdminVerification';
 import AdminReports from './pages/Admin/AdminReports';
 
-
 function Placeholder({ title }: { title: string }) {
   return (
     <div style={{ padding: '40px' }}>
@@ -53,13 +52,16 @@ function App() {
         {/* =========================
             PUBLIC ROUTES
         ========================== */}
+
         <Route path="/" element={<LandingPage />} />
+
         <Route path="/login" element={<LoginPage />} />
 
 
         {/* =========================
             PATIENT PORTAL
         ========================== */}
+
         <Route path="/patient" element={<PatientLayout />}>
 
           <Route
@@ -118,6 +120,7 @@ function App() {
         {/* =========================
             DOCTOR PORTAL
         ========================== */}
+
         <Route path="/doctor" element={<DoctorLayout />}>
 
           <Route
@@ -166,46 +169,51 @@ function App() {
         {/* =========================
             ADMIN PORTAL
         ========================== */}
-        path="/admin"
 
-        <Route
-          index
-          element={<Navigate to="dashboard" replace />}
-        />
+        <Route path="/admin">
 
-        <Route
-          path="dashboard"
-          element={<AdminDashboard />}
-        />
+          <Route
+            index
+            element={<Navigate to="dashboard" replace />}
+          />
 
-        <Route
-          path="doctors"
-          element={<AdminDoctors />}
-        />
+          <Route
+            path="dashboard"
+            element={<AdminDashboard />}
+          />
 
-        <Route
-          path="patients"
-          element={<AdminPatients />}
-        />
+          <Route
+            path="doctors"
+            element={<AdminDoctors />}
+          />
 
-        <Route
-          path="appointments"
-          element={<Placeholder title="Manage Appointments" />}
-        />
+          <Route
+            path="patients"
+            element={<AdminPatients />}
+          />
 
-        <Route
-          path="verification"
-          element={<AdminVerification />}
-        />
+          <Route
+            path="appointments"
+            element={<Placeholder title="Manage Appointments" />}
+          />
 
-        <Route
-          path="reports"
-          element={<AdminReports />}
-        />
+          <Route
+            path="verification"
+            element={<AdminVerification />}
+          />
+
+          <Route
+            path="reports"
+            element={<AdminReports />}
+          />
+
+        </Route>
+
 
         {/* =========================
             FALLBACK
         ========================== */}
+
         <Route
           path="*"
           element={<Navigate to="/" replace />}
