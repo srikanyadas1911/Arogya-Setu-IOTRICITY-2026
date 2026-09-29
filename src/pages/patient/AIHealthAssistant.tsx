@@ -6,14 +6,16 @@ import {
     Sparkles,
     ShieldCheck,
     RotateCcw,
+    BookOpen,
 } from "lucide-react";
-
+import { sendAIMessage } from "../../services/api";
 import "./AIHealthAssistant.css";
 
 type Message = {
     id: number;
     sender: "assistant" | "user";
     text: string;
+    sources?: string[];
 };
 
 const initialMessages: Message[] = [
@@ -21,66 +23,31 @@ const initialMessages: Message[] = [
         id: 1,
         sender: "assistant",
         text:
-            "Hello! 👋 I'm your Arogya Setu AI Health Assistant. How can I help you today?",
+            "Hello! 👋 I'm your Arogya Setu AI Health Assistant, powered by our clinical RAG knowledge engine. How can I help you today?",
     },
     {
         id: 2,
         sender: "assistant",
         text:
-            "You can ask me about your medicines, appointments, prescriptions, or general health information.",
+            "You can ask me about medication schedules, consultation preparation, health tips, or lab readings. I'm here to assist your care journey.",
     },
 ];
 
 const quickQuestions = [
-    "What medicines do I have today?",
-    "When is my next appointment?",
-    "Explain my prescription",
-    "How can I stay healthy?",
+    "How should I prepare for my upcoming consultation?",
+    "What should I do if I miss a dose?",
+    "How to manage high blood pressure at home?",
+    "Explain prescription instructions",
 ];
 
 function AIHealthAssistant() {
-    const [messages, setMessages] =
-        useState<Message[]>(initialMessages);
-
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
 
-    const generateReply = (question: string) => {
-        const lowerQuestion = question.toLowerCase();
-
-        if (
-            lowerQuestion.includes("medicine") ||
-            lowerQuestion.includes("medicines")
-        ) {
-            return "According to your current medication schedule, you have Vitamin D at 8:00 AM, Metformin at 1:00 PM, Calcium at 6:00 PM, and Medicine X at 9:00 PM.";
-        }
-
-        if (
-            lowerQuestion.includes("appointment") ||
-            lowerQuestion.includes("doctor")
-        ) {
-            return "Your next appointment is with Dr. Ananya Sharma, General Physician, today at 10:30 AM. You can join the consultation from the Join Consultation section.";
-        }
-
-        if (
-            lowerQuestion.includes("prescription")
-        ) {
-            return "Your latest prescription was issued by Dr. Ananya Sharma for Fever & Viral Infection. It contains 3 medicines.";
-        }
-
-        if (
-            lowerQuestion.includes("healthy") ||
-            lowerQuestion.includes("health")
-        ) {
-            return "For general wellness, focus on regular sleep, balanced meals, hydration, physical activity, and taking prescribed medicines on schedule.";
-        }
-
-        return "I can help you with your medicines, appointments, prescriptions, and general health information. Please tell me what you would like to know.";
-    };
-
-    const sendMessage = (messageText?: string) => {
+    const sendMessage = async (messageText?: string) => {
         const text = (messageText ?? input).trim();
-
-        if (!text) return;
+        if (!text || isTyping) return;
 
         const userMessage: Message = {
             id: Date.now(),
@@ -88,19 +55,36 @@ function AIHealthAssistant() {
             text,
         };
 
-        const assistantMessage: Message = {
-            id: Date.now() + 1,
-            sender: "assistant",
-            text: generateReply(text),
-        };
-
-        setMessages((currentMessages) => [
-            ...currentMessages,
-            userMessage,
-            assistantMessage,
-        ]);
-
+        setMessages((current) => [...current, userMessage]);
         setInput("");
+        setIsTyping(true);
+
+        try {
+            const history = messages.map((m) => ({
+                role: m.sender === "user" ? "user" : "assistant",
+                content: m.text,
+            }));
+
+            const response = await sendAIMessage(text, history);
+
+            const assistantMessage: Message = {
+                id: Date.now() + 1,
+                sender: "assistant",
+                text: response.answer,
+                sources: response.sources,
+            };
+
+            setMessages((current) => [...current, assistantMessage]);
+        } catch {
+            const fallbackMessage: Message = {
+                id: Date.now() + 1,
+                sender: "assistant",
+                text: "I am ready to help. Please consult your physician for tailored clinical advice.",
+            };
+            setMessages((current) => [...current, fallbackMessage]);
+        } finally {
+            setIsTyping(false);
+        }
     };
 
     const resetChat = () => {
@@ -110,9 +94,7 @@ function AIHealthAssistant() {
 
     return (
         <div className="ai-assistant-page">
-
             {/* Header */}
-
             <div className="ai-assistant-header">
                 <div>
                     <div className="ai-title-row">
@@ -122,9 +104,8 @@ function AIHealthAssistant() {
 
                         <div>
                             <h1>AI Health Assistant</h1>
-
                             <p>
-                                Your intelligent health companion from Arogya Setu.
+                                Clinical RAG knowledge &amp; triage assistant for Arogya Setu.
                             </p>
                         </div>
                     </div>
@@ -140,135 +121,119 @@ function AIHealthAssistant() {
                 </button>
             </div>
 
-            {/* AI Disclaimer */}
-
+            {/* Disclaimer */}
             <div className="ai-disclaimer">
-                <ShieldCheck size={19} />
-
-                <span>
-                    This AI assistant provides general health information
-                    and does not replace professional medical advice.
-                </span>
+                <ShieldCheck size={20} />
+                <p>
+                    <strong>Medical Disclaimer:</strong> Arogya Setu AI provides evidence-based guidance and consultation preparation. It does not provide medical diagnoses or replace licensed physicians.
+                </p>
             </div>
 
-            {/* Chat Layout */}
-
-            <div className="ai-chat-container">
-
-                {/* Chat Header */}
-
-                <div className="chat-header">
-                    <div className="chat-bot-avatar">
-                        <Bot size={21} />
-                    </div>
-
-                    <div>
-                        <strong>Arogya AI</strong>
-
-                        <span>
-                            <span className="online-dot"></span>
-                            Online
-                        </span>
-                    </div>
+            {/* Quick Suggestions */}
+            <div className="quick-questions-card">
+                <div className="quick-title">
+                    <Sparkles size={16} />
+                    <span>Quick Suggestions</span>
                 </div>
 
-                {/* Messages */}
+                <div className="quick-list">
+                    {quickQuestions.map((question) => (
+                        <button
+                            key={question}
+                            type="button"
+                            className="quick-question-pill"
+                            onClick={() => sendMessage(question)}
+                        >
+                            {question}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-                <div className="chat-messages">
-
+            {/* Chat Messages */}
+            <div className="chat-container">
+                <div className="messages-list">
                     {messages.map((message) => (
                         <div
                             key={message.id}
-                            className={`chat-message ${message.sender === "user"
-                                    ? "user-message"
-                                    : "assistant-message"
-                                }`}
+                            className={`message-row ${
+                                message.sender === "user"
+                                    ? "user-row"
+                                    : "assistant-row"
+                            }`}
                         >
-
-                            {message.sender === "assistant" && (
-                                <div className="message-avatar assistant-avatar">
+                            <div className="message-avatar">
+                                {message.sender === "user" ? (
+                                    <UserRound size={17} />
+                                ) : (
                                     <Bot size={17} />
-                                </div>
-                            )}
-
-                            <div className="message-content">
-                                <div className="message-bubble">
-                                    {message.text}
-                                </div>
+                                )}
                             </div>
 
-                            {message.sender === "user" && (
-                                <div className="message-avatar user-avatar">
-                                    <UserRound size={17} />
+                            <div className="message-content">
+                                <div style={{ whiteSpace: "pre-line" }}>
+                                    {message.text}
                                 </div>
-                            )}
 
+                                {message.sources && message.sources.length > 0 && (
+                                    <div style={{
+                                        marginTop: "10px",
+                                        paddingTop: "8px",
+                                        borderTop: "1px dashed rgba(0,0,0,0.1)",
+                                        fontSize: "11px",
+                                        color: "var(--gray-500)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "5px"
+                                    }}>
+                                        <BookOpen size={13} color="var(--primary)" />
+                                        <span>Sources: {message.sources.join(" • ")}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
 
+                    {isTyping && (
+                        <div className="message-row assistant-row">
+                            <div className="message-avatar">
+                                <Bot size={17} />
+                            </div>
+                            <div className="message-content" style={{ color: "var(--gray-500)", fontStyle: "italic" }}>
+                                Analyzing query against clinical RAG guidelines...
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Quick Questions */}
+                {/* Input Area */}
+                <div className="chat-input-section">
+                    <div className="chat-input-box">
+                        <textarea
+                            placeholder="Ask about medications, symptoms, consultation prep..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    sendMessage();
+                                }
+                            }}
+                            rows={1}
+                        />
 
-                <div className="quick-questions">
-
-                    <div className="quick-title">
-                        <Sparkles size={15} />
-                        Suggested questions
+                        <button
+                            type="button"
+                            className="send-button"
+                            onClick={() => sendMessage()}
+                            disabled={!input.trim() || isTyping}
+                            style={{ opacity: !input.trim() || isTyping ? 0.6 : 1 }}
+                        >
+                            <Send size={18} />
+                        </button>
                     </div>
-
-                    <div className="quick-question-list">
-
-                        {quickQuestions.map((question) => (
-                            <button
-                                key={question}
-                                type="button"
-                                onClick={() => sendMessage(question)}
-                            >
-                                {question}
-                            </button>
-                        ))}
-
-                    </div>
-
                 </div>
-
-                {/* Input */}
-
-                <div className="chat-input-area">
-
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(event) =>
-                            setInput(event.target.value)
-                        }
-                        onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                                sendMessage();
-                            }
-                        }}
-                        placeholder="Ask your health question..."
-                    />
-
-                    <button
-                        type="button"
-                        className="send-message-button"
-                        onClick={() => sendMessage()}
-                        disabled={!input.trim()}
-                        title="Send message"
-                    >
-                        <Send size={19} />
-                    </button>
-
-                </div>
-
-                <div className="chat-footer">
-                    Arogya Setu AI • For informational purposes only
-                </div>
-
             </div>
-
         </div>
     );
 }

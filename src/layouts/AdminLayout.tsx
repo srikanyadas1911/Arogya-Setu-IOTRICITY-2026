@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCheck, CalendarDays,
   ShieldCheck, BarChart2, Settings, LogOut, Bell, Menu, X, Shield,
 } from 'lucide-react';
-import { mockNotifications } from '../data/mockData';
+import { fetchNotifications, markNotificationRead, clearAuth } from '../services/api';
 import { type Notification } from '../data/mockData';
 import NotificationPanel from '../components/NotificationPanel';
 
@@ -20,13 +20,23 @@ const navItems = [
 export default function AdminLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([...mockNotifications]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifs, setShowNotifs] = useState(false);
+
+  useEffect(() => {
+    fetchNotifications('admin').then(setNotifications);
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const handleMarkRead = (id: string) => {
+  const handleMarkRead = async (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    await markNotificationRead(id);
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate('/login');
   };
 
   return (
@@ -66,7 +76,7 @@ export default function AdminLayout() {
             <Settings size={18} />
             Settings
           </button>
-          <button className="nav-item" onClick={() => navigate('/login')}>
+          <button className="nav-item" onClick={handleLogout}>
             <LogOut size={18} />
             Logout
           </button>

@@ -1,55 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import {
     Search,
     Stethoscope,
     CheckCircle,
     Clock,
     XCircle,
-} from 'lucide-react';
-import './AdminDoctors.css';
-
-const initialDoctors = [
-    {
-        name: 'Dr. Priya Sharma',
-        specialty: 'Cardiologist',
-        status: 'Verified',
-    },
-    {
-        name: 'Dr. Amit Roy',
-        specialty: 'General Physician',
-        status: 'Pending',
-    },
-    {
-        name: 'Dr. Neha Kapoor',
-        specialty: 'Dermatologist',
-        status: 'Verified',
-    },
-    {
-        name: 'Dr. Rahul Sen',
-        specialty: 'Neurologist',
-        status: 'Pending',
-    },
-];
+} from "lucide-react";
+import { fetchDoctors, verifyDoctor } from "../../services/api";
+import { type Doctor } from "../../data/mockData";
+import "./AdminDoctors.css";
 
 function AdminDoctors() {
-    const [search, setSearch] = useState('');
-    const [doctors, setDoctors] = useState(initialDoctors);
+    const [search, setSearch] = useState("");
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const loadDoctors = () => {
+        setLoading(true);
+        fetchDoctors().then((data) => {
+            setDoctors(data);
+            setLoading(false);
+        });
+    };
+
+    useEffect(() => {
+        loadDoctors();
+    }, []);
 
     const filteredDoctors = doctors.filter(
         (doctor) =>
             doctor.name.toLowerCase().includes(search.toLowerCase()) ||
-            doctor.specialty.toLowerCase().includes(search.toLowerCase())
+            doctor.specialization.toLowerCase().includes(search.toLowerCase())
     );
 
-    const updateStatus = (
-        index: number,
-        status: 'Verified' | 'Rejected'
+    const updateStatus = async (
+        id: string,
+        status: "verified" | "rejected" | "pending"
     ) => {
         setDoctors((current) =>
-            current.map((doctor, i) =>
-                i === index ? { ...doctor, status } : doctor
-            )
+            current.map((d) => (d.id === id ? { ...d, verificationStatus: status } : d))
         );
+        await verifyDoctor(id, status);
     };
 
     return (
@@ -57,7 +48,7 @@ function AdminDoctors() {
             <div className="admin-doctors-header">
                 <div>
                     <h1>Manage Doctors</h1>
-                    <p>Review and manage registered doctors.</p>
+                    <p>Review and manage registered doctors across all clinical faculties.</p>
                 </div>
             </div>
 
@@ -71,78 +62,71 @@ function AdminDoctors() {
                 />
             </div>
 
-            <div className="admin-doctors-list">
-                {filteredDoctors.map((doctor, index) => (
-                    <div className="admin-doctor-card" key={doctor.name}>
-                        <div className="admin-doctor-info">
-                            <div className="admin-doctor-avatar">
-                                <Stethoscope size={22} />
+            {loading ? (
+                <div style={{ padding: "40px", textAlign: "center", color: "var(--gray-500)" }}>
+                    Loading enrolled doctors...
+                </div>
+            ) : (
+                <div className="admin-doctors-list">
+                    {filteredDoctors.map((doctor) => (
+                        <div className="admin-doctor-card" key={doctor.id}>
+                            <div className="admin-doctor-info">
+                                <div className="admin-doctor-avatar">
+                                    <Stethoscope size={22} />
+                                </div>
+
+                                <div>
+                                    <h3>{doctor.name}</h3>
+                                    <span>{doctor.specialization} • {doctor.hospital}</span>
+                                </div>
                             </div>
 
-                            <div>
-                                <h3>{doctor.name}</h3>
-                                <span>{doctor.specialty}</span>
+                            <div
+                                className={
+                                    doctor.verificationStatus === "verified"
+                                        ? "doctor-status verified"
+                                        : doctor.verificationStatus === "pending"
+                                        ? "doctor-status pending"
+                                        : "doctor-status rejected"
+                                }
+                            >
+                                {doctor.verificationStatus === "verified" && (
+                                    <CheckCircle size={16} />
+                                )}
+                                {doctor.verificationStatus === "pending" && (
+                                    <Clock size={16} />
+                                )}
+                                {doctor.verificationStatus === "rejected" && (
+                                    <XCircle size={16} />
+                                )}
+                                <span style={{ textTransform: "capitalize" }}>{doctor.verificationStatus}</span>
                             </div>
-                        </div>
 
-                        <div
-                            className={
-                                doctor.status === 'Verified'
-                                    ? 'doctor-status verified'
-                                    : doctor.status === 'Pending'
-                                        ? 'doctor-status pending'
-                                        : 'doctor-status rejected'
-                            }
-                        >
-                            {doctor.status === 'Verified' && (
-                                <CheckCircle size={16} />
-                            )}
-
-                            {doctor.status === 'Pending' && (
-                                <Clock size={16} />
-                            )}
-
-                            {doctor.status === 'Rejected' && (
-                                <XCircle size={16} />
-                            )}
-
-                            {doctor.status}
-                        </div>
-
-                        <div className="doctor-actions">
-                            {doctor.status === 'Pending' && (
-                                <>
+                            <div className="admin-doctor-actions">
+                                {doctor.verificationStatus !== "verified" && (
                                     <button
-                                        className="verify-button"
-                                        onClick={() => updateStatus(index, 'Verified')}
+                                        type="button"
+                                        className="verify-btn"
+                                        onClick={() => updateStatus(doctor.id, "verified")}
                                     >
                                         Verify
                                     </button>
+                                )}
 
+                                {doctor.verificationStatus !== "rejected" && (
                                     <button
-                                        className="reject-button"
-                                        onClick={() => updateStatus(index, 'Rejected')}
+                                        type="button"
+                                        className="reject-btn"
+                                        onClick={() => updateStatus(doctor.id, "rejected")}
                                     >
                                         Reject
                                     </button>
-                                </>
-                            )}
-
-                            {doctor.status === 'Verified' && (
-                                <button className="view-doctor-button">
-                                    View Profile
-                                </button>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
-
-                {filteredDoctors.length === 0 && (
-                    <div className="no-doctors">
-                        No doctors found.
-                    </div>
-                )}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // Layouts
 import PatientLayout from './layouts/PatientLayout';
 import DoctorLayout from './layouts/DoctorLayout';
+import AdminLayout from './layouts/AdminLayout';
 
 // Public Pages
 import LandingPage from './pages/landing/LandingPage';
@@ -32,17 +33,9 @@ import DoctorPrescription from './pages/Doctor/DoctorPrescription';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminDoctors from './pages/Admin/AdminDoctors';
 import AdminPatients from './pages/Admin/AdminPatients';
+import AdminAppointments from './pages/Admin/AdminAppointments';
 import AdminVerification from './pages/Admin/AdminVerification';
 import AdminReports from './pages/Admin/AdminReports';
-
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div style={{ padding: '40px' }}>
-      <h1>{title}</h1>
-      <p>This page is coming soon.</p>
-    </div>
-  );
-}
 
 function App() {
   return (
@@ -170,7 +163,7 @@ function App() {
             ADMIN PORTAL
         ========================== */}
 
-        <Route path="/admin">
+        <Route path="/admin" element={<AdminLayout />}>
 
           <Route
             index
@@ -194,7 +187,7 @@ function App() {
 
           <Route
             path="appointments"
-            element={<Placeholder title="Manage Appointments" />}
+            element={<AdminAppointments />}
           />
 
           <Route

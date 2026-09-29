@@ -1,45 +1,32 @@
-import { Search, UserRound } from 'lucide-react';
-import { useState } from 'react';
-import './AdminPatients.css';
-
-const patients = [
-    {
-        name: 'Ananya Sen',
-        age: 28,
-        gender: 'Female',
-        phone: '+91 98765 43210',
-        status: 'Active',
-    },
-    {
-        name: 'Rahul Mehta',
-        age: 35,
-        gender: 'Male',
-        phone: '+91 91234 56789',
-        status: 'Active',
-    },
-    {
-        name: 'Shreya Kapoor',
-        age: 24,
-        gender: 'Female',
-        phone: '+91 99887 66554',
-        status: 'Active',
-    },
-    {
-        name: 'Arjun Das',
-        age: 42,
-        gender: 'Male',
-        phone: '+91 90123 45678',
-        status: 'Inactive',
-    },
-];
+import { useState, useEffect } from "react";
+import { Search, UserRound } from "lucide-react";
+import { fetchPatients } from "../../services/api";
+import { type Patient } from "../../data/mockData";
+import "./AdminPatients.css";
 
 function AdminPatients() {
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState("");
+    const [patients, setPatients] = useState<Patient[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+        fetchPatients().then((data) => {
+            if (isMounted) {
+                setPatients(data);
+                setLoading(false);
+            }
+        });
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const filteredPatients = patients.filter(
         (patient) =>
             patient.name.toLowerCase().includes(search.toLowerCase()) ||
-            patient.phone.includes(search)
+            patient.phone.includes(search) ||
+            patient.email.toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -47,60 +34,65 @@ function AdminPatients() {
             <div className="admin-patients-header">
                 <div>
                     <h1>Manage Patients</h1>
-                    <p>View and manage registered patients.</p>
+                    <p>View and manage registered patients across the network.</p>
                 </div>
             </div>
 
             <div className="patient-search">
                 <Search size={20} />
-
                 <input
                     type="text"
-                    placeholder="Search patients..."
+                    placeholder="Search patients by name, email, or phone..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
             </div>
 
-            <div className="admin-patients-list">
-                {filteredPatients.map((patient) => (
-                    <div className="admin-patient-card" key={patient.name}>
-                        <div className="admin-patient-info">
-                            <div className="admin-patient-avatar">
-                                <UserRound size={22} />
+            {loading ? (
+                <div style={{ padding: "40px", textAlign: "center", color: "var(--gray-500)" }}>
+                    Loading patient database...
+                </div>
+            ) : (
+                <div className="admin-patients-list">
+                    {filteredPatients.map((patient) => (
+                        <div className="admin-patient-card" key={patient.id}>
+                            <div className="admin-patient-info">
+                                <div className="admin-patient-avatar">
+                                    <UserRound size={22} />
+                                </div>
+
+                                <div>
+                                    <h3>{patient.name}</h3>
+                                    <p>
+                                        {patient.age} years • {patient.gender} • Blood: {patient.bloodGroup}
+                                    </p>
+                                    <span>{patient.phone} • {patient.email}</span>
+                                </div>
                             </div>
 
-                            <div>
-                                <h3>{patient.name}</h3>
-                                <p>
-                                    {patient.age} years • {patient.gender}
-                                </p>
-                                <span>{patient.phone}</span>
+                            <div className="patient-status active">
+                                Active
                             </div>
+
+                            <button
+                                type="button"
+                                className="view-patient-button"
+                                onClick={() =>
+                                    alert(
+                                        `Patient Record: ${patient.name}\nAge: ${patient.age}\nConditions: ${patient.conditions?.join(", ") || "None"}\nAllergies: ${patient.allergies?.join(", ") || "None"}`
+                                    )
+                                }
+                            >
+                                View Record
+                            </button>
                         </div>
+                    ))}
 
-                        <div
-                            className={
-                                patient.status === 'Active'
-                                    ? 'patient-status active'
-                                    : 'patient-status inactive'
-                            }
-                        >
-                            {patient.status}
-                        </div>
-
-                        <button className="view-patient-button">
-                            View Profile
-                        </button>
-                    </div>
-                ))}
-
-                {filteredPatients.length === 0 && (
-                    <div className="no-patients">
-                        No patients found.
-                    </div>
-                )}
-            </div>
+                    {filteredPatients.length === 0 && (
+                        <div className="no-patients">No patients found matching '{search}'.</div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

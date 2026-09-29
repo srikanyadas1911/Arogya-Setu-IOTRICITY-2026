@@ -1,0 +1,159 @@
+.doctor-appointments-page {
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.doctor-appointments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.doctor-appointments-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.doctor-appointments-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.doctor-date-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-card {
+  display: grid;
+  grid-template-columns: 1.4fr 1.5fr auto auto;
+  align-items: center;
+  gap: 24px;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+.appointment-patient {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.patient-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 50%;
+}
+
+.appointment-patient h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.appointment-patient p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.appointment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appointment-info div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.appointment-info svg {
+  color: #2563eb;
+}
+
+.appointment-status {
+  padding: 7px 12px;
+  background: #ecfdf5;
+  color: #15803d;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.join-button {
+  border: none;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.join-button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+  .appointment-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .appointment-status,
+  .join-button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .doctor-appointments-page {
+    padding: 20px;
+  }
+
+  .doctor-appointments-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .appointment-card {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-status,
+  .join-button {
+    width: 100%;
+  }
+}

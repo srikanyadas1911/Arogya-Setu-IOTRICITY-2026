@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -17,7 +17,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 
-import { mockNotifications } from "../data/mockData";
+import { fetchNotifications, markNotificationRead, clearAuth } from "../services/api";
 import { type Notification } from "../data/mockData";
 import NotificationPanel from "../components/NotificationPanel";
 
@@ -63,17 +63,18 @@ export default function DoctorLayout() {
   const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const [notifications, setNotifications] =
-    useState<Notification[]>([...mockNotifications]);
-
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifs, setShowNotifs] = useState(false);
+
+  useEffect(() => {
+    fetchNotifications("doctor").then(setNotifications);
+  }, []);
 
   const unreadCount = notifications.filter(
     (notification) => !notification.read
   ).length;
 
-  const handleMarkRead = (id: string) => {
+  const handleMarkRead = async (id: string) => {
     setNotifications((currentNotifications) =>
       currentNotifications.map((notification) =>
         notification.id === id
@@ -81,12 +82,15 @@ export default function DoctorLayout() {
           : notification
       )
     );
+    await markNotificationRead(id);
   };
 
   const handleLogout = () => {
+    clearAuth();
     setSidebarOpen(false);
     navigate("/login");
   };
+
 
   return (
     <div

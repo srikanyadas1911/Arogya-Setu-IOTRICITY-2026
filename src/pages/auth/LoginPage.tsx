@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, User, Stethoscope, Shield, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Heart, User, Stethoscope, Shield, Eye, EyeOff, Mail, Lock, UserPlus } from 'lucide-react';
+import { loginUser, registerUser } from '../../services/api';
 
 type Role = 'patient' | 'doctor' | 'admin';
 
@@ -18,29 +19,61 @@ const demos: Record<Role, { email: string; password: string }> = {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState<Role>('patient');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) { setError('Please fill in all fields.'); return; }
+    if (isRegister && !name.trim()) { setError('Please enter your full name.'); return; }
     setError('');
+    setSuccessMsg('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    setLoading(false);
-    navigate(roleConfig[role].path);
+
+    try {
+      if (isRegister) {
+        const res = await registerUser({
+          email,
+          password,
+          role,
+          name: name.trim(),
+        });
+        if (res.success) {
+          setSuccessMsg('Account registered successfully! Redirecting...');
+          setTimeout(() => navigate(roleConfig[role].path), 500);
+        } else {
+          setError(res.error || 'Registration failed');
+        }
+      } else {
+        const res = await loginUser(email, password, role);
+        if (res.success) {
+          navigate(roleConfig[role].path);
+        } else {
+          setError(res.error || 'Invalid email or password');
+        }
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Authentication error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDemo = (demoRole: Role) => {
+    setIsRegister(false);
     setRole(demoRole);
     setEmail(demos[demoRole].email);
     setPassword(demos[demoRole].password);
     setError('');
+    setSuccessMsg('');
   };
 
   const cfg = roleConfig[role];
@@ -75,11 +108,41 @@ export default function LoginPage() {
         {/* Card */}
         <div className="card" style={{ padding: '32px', boxShadow: 'var(--shadow-lg)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '6px', color: 'var(--gray-900)' }}>
-            Welcome back
+            {isRegister ? `Create ${cfg.label} Account` : 'Welcome back'}
           </h2>
-          <p style={{ fontSize: '13px', color: 'var(--gray-500)', marginBottom: '24px' }}>
-            Sign in to access your {cfg.label.toLowerCase()} dashboard
+          <p style={{ fontSize: '13px', color: 'var(--gray-500)', marginBottom: '20px' }}>
+            {isRegister ? `Register as a new ${cfg.label.toLowerCase()} on Arogya Setu` : `Sign in to access your ${cfg.label.toLowerCase()} dashboard`}
           </p>
+
+          {/* Mode Switch (Sign in / Register) */}
+          <div style={{ display: 'flex', background: 'var(--gray-100)', borderRadius: 'var(--radius)', padding: '4px', marginBottom: '20px' }}>
+            <button
+              type="button"
+              onClick={() => { setIsRegister(false); setError(''); setSuccessMsg(''); }}
+              style={{
+                flex: 1, padding: '8px', fontSize: '13px', fontWeight: 600, border: 'none', borderRadius: 'calc(var(--radius) - 2px)',
+                background: !isRegister ? 'var(--white)' : 'transparent',
+                color: !isRegister ? 'var(--gray-900)' : 'var(--gray-500)',
+                boxShadow: !isRegister ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                cursor: 'pointer'
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setIsRegister(true); setError(''); setSuccessMsg(''); }}
+              style={{
+                flex: 1, padding: '8px', fontSize: '13px', fontWeight: 600, border: 'none', borderRadius: 'calc(var(--radius) - 2px)',
+                background: isRegister ? 'var(--white)' : 'transparent',
+                color: isRegister ? 'var(--gray-900)' : 'var(--gray-500)',
+                boxShadow: isRegister ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                cursor: 'pointer'
+              }}
+            >
+              Register
+            </button>
+          </div>
 
           {/* Role Selector */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '24px' }}>
@@ -89,6 +152,7 @@ export default function LoginPage() {
               return (
                 <button
                   key={r}
+                  type="button"
                   onClick={() => setRole(r)}
                   style={{
                     padding: '12px 8px',
@@ -114,10 +178,34 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleLogin} noValidate>
+          <form onSubmit={handleSubmit} noValidate>
             {error && (
               <div style={{ padding: '10px 14px', background: 'var(--danger-bg)', border: '1px solid #fca5a5', borderRadius: 'var(--radius)', marginBottom: '16px', fontSize: '13px', color: 'var(--danger)' }}>
                 {error}
+              </div>
+            )}
+            {successMsg && (
+              <div style={{ padding: '10px 14px', background: 'var(--success-bg)', border: '1px solid #86efac', borderRadius: 'var(--radius)', marginBottom: '16px', fontSize: '13px', color: 'var(--success)' }}>
+                {successMsg}
+              </div>
+            )}
+
+            {isRegister && (
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" htmlFor="name">Full Name</label>
+                <div style={{ position: 'relative' }}>
+                  <UserPlus size={16} color="var(--gray-400)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input
+                    id="name"
+                    type="text"
+                    className="form-input"
+                    placeholder="Dr. / Mr. / Ms. Full Name"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    style={{ paddingLeft: '38px', width: '100%' }}
+                    required
+                  />
+                </div>
               </div>
             )}
 
@@ -163,29 +251,31 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: 'var(--gray-600)' }}>
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={e => setRemember(e.target.checked)}
-                  style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
-                />
-                Remember me
-              </label>
-              <button type="button" style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
-                Forgot password?
-              </button>
-            </div>
+            {!isRegister && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: 'var(--gray-600)' }}>
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={e => setRemember(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
+                  />
+                  Remember me
+                </label>
+                <button type="button" style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                  Forgot password?
+                </button>
+              </div>
+            )}
 
             <button
               type="submit"
               className="btn btn-primary"
               disabled={loading}
-              style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '15px', marginBottom: '12px' }}
+              style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '15px', marginBottom: '12px', marginTop: isRegister ? '16px' : '0' }}
               aria-busy={loading}
             >
-              {loading ? 'Signing in...' : `Sign in as ${cfg.label}`}
+              {loading ? (isRegister ? 'Creating account...' : 'Signing in...') : (isRegister ? `Register as ${cfg.label}` : `Sign in as ${cfg.label}`)}
             </button>
 
             <button
@@ -197,6 +287,7 @@ export default function LoginPage() {
               Back to Home
             </button>
           </form>
+
 
           {/* Demo Logins */}
           <div style={{ marginTop: '24px', padding: '16px', background: 'var(--gray-50)', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)' }}>

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Search,
@@ -6,289 +7,165 @@ import {
     CalendarDays,
     Stethoscope,
 } from "lucide-react";
-
+import { fetchDoctors } from "../../services/api";
+import { type Doctor } from "../../data/mockData";
 import "./FindDoctor.css";
+
+const specialties = [
+    "All Specialties",
+    "General Physician",
+    "Cardiologist",
+    "Dermatologist",
+    "Orthopedic",
+];
 
 function FindDoctor() {
     const navigate = useNavigate();
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [search, setSearch] = useState("");
+    const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+        setLoading(true);
+        fetchDoctors({
+            search,
+            specialization: selectedSpecialty,
+            verifiedOnly: true,
+        }).then((data) => {
+            if (isMounted) {
+                setDoctors(data);
+                setLoading(false);
+            }
+        });
+        return () => {
+            isMounted = false;
+        };
+    }, [search, selectedSpecialty]);
+
+    const getInitials = (name: string) => {
+        return name
+            .replace("Dr.", "")
+            .trim()
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+    };
 
     return (
         <div className="find-doctor-page">
-
             {/* Header */}
             <div className="find-doctor-header">
-
                 <div>
                     <h1>Find a Doctor</h1>
-
-                    <p>
-                        Find the right doctor for your healthcare needs.
-                    </p>
+                    <p>Find the right verified doctor for your healthcare needs.</p>
                 </div>
-
             </div>
 
-
-            {/* Search */}
+            {/* Search and Filters */}
             <div className="doctor-search-section">
-
                 <div className="doctor-search-box">
-
                     <Search size={20} />
-
                     <input
                         type="text"
-                        placeholder="Search doctor or specialty..."
+                        placeholder="Search doctor, hospital, or specialty..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
-
                 </div>
 
-                <button className="specialty-filter">
-                    All Specialties
-                </button>
-
+                <div style={{ position: "relative" }}>
+                    <select
+                        className="specialty-filter"
+                        value={selectedSpecialty}
+                        onChange={(e) => setSelectedSpecialty(e.target.value)}
+                        style={{
+                            cursor: "pointer",
+                            appearance: "none",
+                            paddingRight: "28px",
+                            height: "100%",
+                        }}
+                    >
+                        {specialties.map((s) => (
+                            <option key={s} value={s}>
+                                {s}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
+            {/* Loading / Empty States */}
+            {loading && (
+                <div style={{ padding: "40px", textAlign: "center", color: "var(--gray-500)" }}>
+                    Loading verified doctors...
+                </div>
+            )}
+
+            {!loading && doctors.length === 0 && (
+                <div style={{ padding: "48px 24px", textAlign: "center", background: "var(--white)", borderRadius: "var(--radius-lg)", border: "1px solid var(--gray-200)" }}>
+                    <Stethoscope size={40} color="var(--gray-400)" style={{ margin: "0 auto 12px" }} />
+                    <h3 style={{ fontSize: "16px", color: "var(--gray-800)", marginBottom: "4px" }}>No doctors found</h3>
+                    <p style={{ fontSize: "13px", color: "var(--gray-500)" }}>Try searching for a different specialty or clearing your search filter.</p>
+                </div>
+            )}
 
             {/* Doctor List */}
             <div className="doctor-list">
-
-
-                {/* Doctor 1 */}
-                <div className="doctor-card">
-
-                    <div className="doctor-card-top">
-
-                        <div className="doctor-avatar-large">
-                            AS
-                        </div>
-
-                        <div className="doctor-details">
-
-                            <h2>
-                                Dr. Ananya Sharma
-                            </h2>
-
-                            <p className="doctor-specialty">
-                                General Physician
-                            </p>
-
-                            <div className="doctor-rating">
-
-                                <Star
-                                    size={16}
-                                    fill="currentColor"
-                                />
-
-                                <span>
-                                    4.9
-                                </span>
-
-                                <span>
-                                    · 120 reviews
-                                </span>
-
+                {doctors.map((doc) => (
+                    <div className="doctor-card" key={doc.id}>
+                        <div className="doctor-card-top">
+                            <div className="doctor-avatar-large">
+                                {getInitials(doc.name)}
                             </div>
 
+                            <div className="doctor-details">
+                                <h2>{doc.name}</h2>
+                                <p className="doctor-specialty">{doc.specialization}</p>
+
+                                <div className="doctor-rating">
+                                    <Star size={16} fill="currentColor" />
+                                    <span>{doc.rating}</span>
+                                    <span>· {doc.totalPatients || 100}+ patients</span>
+                                </div>
+                            </div>
                         </div>
 
-                    </div>
-
-
-                    <div className="doctor-info-row">
-
-                        <span>
-                            <Stethoscope size={16} />
-                            8+ years experience
-                        </span>
-
-                        <span>
-                            <MapPin size={16} />
-                            Kolkata
-                        </span>
-
-                    </div>
-
-
-                    <div className="doctor-card-bottom">
-
-                        <div className="consultation-fee">
-                            <strong>₹500</strong>
-                            <span> consultation</span>
+                        <div className="doctor-info-row">
+                            <span>
+                                <Stethoscope size={16} />
+                                {doc.experience}+ years experience
+                            </span>
+                            <span>
+                                <MapPin size={16} />
+                                {doc.hospital.split(",")[1]?.trim() || doc.hospital}
+                            </span>
                         </div>
 
-                        <button
-                            className="book-doctor-button"
-                            onClick={() =>
-                                navigate("/patient/book-appointment")
-                            }
-                        >
-                            <CalendarDays size={18} />
-                            Book Appointment
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                {/* Doctor 2 */}
-                <div className="doctor-card">
-
-                    <div className="doctor-card-top">
-
-                        <div className="doctor-avatar-large">
-                            RK
-                        </div>
-
-                        <div className="doctor-details">
-
-                            <h2>
-                                Dr. Rahul Kapoor
-                            </h2>
-
-                            <p className="doctor-specialty">
-                                Cardiologist
-                            </p>
-
-                            <div className="doctor-rating">
-
-                                <Star
-                                    size={16}
-                                    fill="currentColor"
-                                />
-
-                                <span>
-                                    4.8
-                                </span>
-
-                                <span>
-                                    · 98 reviews
-                                </span>
-
+                        <div className="doctor-card-bottom">
+                            <div className="consultation-fee">
+                                <strong>₹{doc.fee}</strong>
+                                <span> consultation</span>
                             </div>
 
+                            <button
+                                className="book-doctor-button"
+                                onClick={() =>
+                                    navigate("/patient/book-appointment", {
+                                        state: { doctorId: doc.id, doctor: doc },
+                                    })
+                                }
+                            >
+                                <CalendarDays size={18} />
+                                Book Appointment
+                            </button>
                         </div>
-
                     </div>
-
-
-                    <div className="doctor-info-row">
-
-                        <span>
-                            <Stethoscope size={16} />
-                            12+ years experience
-                        </span>
-
-                        <span>
-                            <MapPin size={16} />
-                            Kolkata
-                        </span>
-
-                    </div>
-
-
-                    <div className="doctor-card-bottom">
-
-                        <div className="consultation-fee">
-                            <strong>₹800</strong>
-                            <span> consultation</span>
-                        </div>
-
-                        <button
-                            className="book-doctor-button"
-                            onClick={() =>
-                                navigate("/patient/book-appointment")
-                            }
-                        >
-                            <CalendarDays size={18} />
-                            Book Appointment
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                {/* Doctor 3 */}
-                <div className="doctor-card">
-
-                    <div className="doctor-card-top">
-
-                        <div className="doctor-avatar-large">
-                            PM
-                        </div>
-
-                        <div className="doctor-details">
-
-                            <h2>
-                                Dr. Priya Mehta
-                            </h2>
-
-                            <p className="doctor-specialty">
-                                Dermatologist
-                            </p>
-
-                            <div className="doctor-rating">
-
-                                <Star
-                                    size={16}
-                                    fill="currentColor"
-                                />
-
-                                <span>
-                                    4.9
-                                </span>
-
-                                <span>
-                                    · 86 reviews
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div className="doctor-info-row">
-
-                        <span>
-                            <Stethoscope size={16} />
-                            7+ years experience
-                        </span>
-
-                        <span>
-                            <MapPin size={16} />
-                            Kolkata
-                        </span>
-
-                    </div>
-
-
-                    <div className="doctor-card-bottom">
-
-                        <div className="consultation-fee">
-                            <strong>₹600</strong>
-                            <span> consultation</span>
-                        </div>
-
-                        <button
-                            className="book-doctor-button"
-                            onClick={() =>
-                                navigate("/patient/book-appointment")
-                            }
-                        >
-                            <CalendarDays size={18} />
-                            Book Appointment
-                        </button>
-
-                    </div>
-
-                </div>
-
+                ))}
             </div>
-
         </div>
     );
 }

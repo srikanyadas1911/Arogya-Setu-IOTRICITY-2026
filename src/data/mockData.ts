@@ -43,7 +43,7 @@ export interface Appointment {
   date: string;
   time: string;
   consultationType: 'video' | 'audio';
-  status: 'upcoming' | 'completed' | 'cancelled' | 'waiting';
+  status: 'upcoming' | 'confirmed' | 'completed' | 'cancelled' | 'waiting';
   reason: string;
   meetingLink?: string;
 }

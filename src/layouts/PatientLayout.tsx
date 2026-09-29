@@ -5,7 +5,7 @@ import {
   FileText, Upload, MessageSquare, Pill, User, Settings, LogOut,
   Bell, Menu, X, Heart, Globe, WifiOff,
 } from 'lucide-react';
-import { mockNotifications } from '../data/mockData';
+import { fetchNotifications, markNotificationRead, clearAuth, getStoredUser } from '../services/api';
 import { type Notification } from '../data/mockData';
 import NotificationPanel from '../components/NotificationPanel';
 
@@ -24,12 +24,19 @@ const navItems = [
 export default function PatientLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([...mockNotifications]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifs, setShowNotifs] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [lang, setLang] = useState('English');
 
+  const currentUser = getStoredUser();
+  const userName = currentUser?.name || 'Priya Sharma';
+
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  useEffect(() => {
+    fetchNotifications('patient').then(setNotifications);
+  }, []);
 
   useEffect(() => {
     const onOnline = () => setIsOffline(false);
@@ -42,11 +49,15 @@ export default function PatientLayout() {
     };
   }, []);
 
-  const handleMarkRead = (id: string) => {
+  const handleMarkRead = async (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    await markNotificationRead(id);
   };
 
-  const handleLogout = () => navigate('/login');
+  const handleLogout = () => {
+    clearAuth();
+    navigate('/login');
+  };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--gray-50)' }}>
@@ -176,7 +187,7 @@ export default function PatientLayout() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div className="avatar avatar-md" style={{ background: 'var(--primary)', color: 'white' }}>PS</div>
               <div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--gray-800)' }}>Priya Sharma</div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--gray-800)' }}>{userName}</div>
                 <div style={{ fontSize: '11px', color: 'var(--gray-400)' }}>Patient</div>
               </div>
             </div>

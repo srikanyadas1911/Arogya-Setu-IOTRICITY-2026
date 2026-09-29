@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     CalendarDays,
@@ -7,234 +7,234 @@ import {
     MapPin,
     UserRound,
     CheckCircle2,
-
+    XCircle,
     ArrowRight,
 } from "lucide-react";
-
+import { fetchAppointments, cancelAppointment, getStoredUser } from "../../services/api";
+import { type Appointment } from "../../data/mockData";
 import "./MyAppointments.css";
 
 function MyAppointments() {
     const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
+    const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [actionMsg, setActionMsg] = useState("");
 
-    const [activeTab, setActiveTab] = useState("Upcoming");
+    const currentUser = getStoredUser();
+    const patientId = currentUser?.profile?.id || "pat-1";
 
-    const upcomingAppointments = [
-        {
-            doctor: "Dr. Ananya Sharma",
-            specialty: "General Physician",
-            date: "Today",
-            time: "10:30 AM",
-            type: "Video Consultation",
-            status: "Confirmed",
-            avatar: "AS",
-        },
-        {
-            doctor: "Dr. Rahul Kapoor",
-            specialty: "Cardiologist",
-            date: "30 Sep",
-            time: "4:00 PM",
-            type: "In-person Visit",
-            status: "Confirmed",
-            avatar: "RK",
-        },
-    ];
+    const loadAppointments = () => {
+        setLoading(true);
+        fetchAppointments(patientId).then((data) => {
+            setAllAppointments(data);
+            setLoading(false);
+        });
+    };
 
-    const pastAppointments = [
-        {
-            doctor: "Dr. Priya Mehta",
-            specialty: "Dermatologist",
-            date: "20 Sep",
-            time: "11:00 AM",
-            type: "Video Consultation",
-            status: "Completed",
-            avatar: "PM",
-        },
-        {
-            doctor: "Dr. Ananya Sharma",
-            specialty: "General Physician",
-            date: "12 Sep",
-            time: "3:30 PM",
-            type: "Video Consultation",
-            status: "Completed",
-            avatar: "AS",
-        },
-    ];
+    useEffect(() => {
+        loadAppointments();
+    }, [patientId]);
 
-    const appointments =
-        activeTab === "Upcoming"
-            ? upcomingAppointments
-            : pastAppointments;
+    const handleCancel = async (id: string) => {
+        if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+        const ok = await cancelAppointment(id);
+        if (ok) {
+            setActionMsg("Appointment cancelled successfully.");
+            setTimeout(() => setActionMsg(""), 3000);
+            loadAppointments();
+        }
+    };
+
+    const getInitials = (name: string) => {
+        return name
+            .replace("Dr.", "")
+            .trim()
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+    };
+
+    const upcomingAppointments = allAppointments.filter(
+        (a) => a.status === "upcoming" || a.status === "confirmed" || a.status === "waiting"
+    );
+
+    const pastAppointments = allAppointments.filter(
+        (a) => a.status === "completed" || a.status === "cancelled"
+    );
+
+    const displayedAppointments =
+        activeTab === "Upcoming" ? upcomingAppointments : pastAppointments;
 
     return (
         <div className="appointments-page">
-
             {/* Header */}
             <div className="appointments-header">
                 <div>
                     <h1>My Appointments</h1>
-                    <p>
-                        View and manage your healthcare appointments.
-                    </p>
+                    <p>View and manage your healthcare appointments.</p>
                 </div>
 
                 <button
                     className="new-appointment-button"
-                    onClick={() =>
-                        navigate("/patient/find-doctor")
-                    }
+                    onClick={() => navigate("/patient/find-doctor")}
                 >
                     <CalendarDays size={18} />
                     Book New Appointment
                 </button>
             </div>
 
+            {actionMsg && (
+                <div style={{
+                    marginBottom: "16px",
+                    padding: "10px 14px",
+                    background: "var(--success-bg)",
+                    border: "1px solid #86efac",
+                    borderRadius: "var(--radius)",
+                    color: "var(--success)",
+                    fontSize: "13px"
+                }}>
+                    {actionMsg}
+                </div>
+            )}
+
             {/* Tabs */}
             <div className="appointment-tabs">
                 <button
-                    className={
-                        activeTab === "Upcoming"
-                            ? "active"
-                            : ""
-                    }
+                    className={activeTab === "Upcoming" ? "active" : ""}
                     onClick={() => setActiveTab("Upcoming")}
                 >
-                    Upcoming
+                    Upcoming ({upcomingAppointments.length})
                 </button>
 
                 <button
-                    className={
-                        activeTab === "Past"
-                            ? "active"
-                            : ""
-                    }
+                    className={activeTab === "Past" ? "active" : ""}
                     onClick={() => setActiveTab("Past")}
                 >
-                    Past Appointments
+                    Past Appointments ({pastAppointments.length})
                 </button>
             </div>
 
-            {/* Appointment List */}
-            <div className="appointments-list">
+            {loading ? (
+                <div style={{ padding: "40px", textAlign: "center", color: "var(--gray-500)" }}>
+                    Loading appointments...
+                </div>
+            ) : (
+                /* Appointment List */
+                <div className="appointments-list">
+                    {displayedAppointments.map((appointment) => (
+                        <div className="appointment-card" key={appointment.id}>
+                            {/* Doctor */}
+                            <div className="appointment-doctor">
+                                <div className="appointment-avatar">
+                                    {getInitials(appointment.doctorName)}
+                                </div>
 
-                {appointments.map((appointment, index) => (
-                    <div
-                        className="appointment-card"
-                        key={index}
-                    >
-
-                        {/* Doctor */}
-                        <div className="appointment-doctor">
-                            <div className="appointment-avatar">
-                                {appointment.avatar}
+                                <div>
+                                    <h2>{appointment.doctorName}</h2>
+                                    <p>{appointment.specialization}</p>
+                                </div>
                             </div>
 
-                            <div>
-                                <h2>
-                                    {appointment.doctor}
-                                </h2>
+                            {/* Details */}
+                            <div className="appointment-details">
+                                <div>
+                                    <CalendarDays size={17} />
+                                    <span>{appointment.date}</span>
+                                </div>
 
-                                <p>
-                                    {appointment.specialty}
-                                </p>
-                            </div>
-                        </div>
+                                <div>
+                                    <Clock size={17} />
+                                    <span>{appointment.time}</span>
+                                </div>
 
-                        {/* Details */}
-                        <div className="appointment-details">
-
-                            <div>
-                                <CalendarDays size={17} />
-                                <span>
-                                    {appointment.date}
-                                </span>
-                            </div>
-
-                            <div>
-                                <Clock size={17} />
-                                <span>
-                                    {appointment.time}
-                                </span>
+                                <div>
+                                    {appointment.consultationType === "video" ? (
+                                        <Video size={17} />
+                                    ) : (
+                                        <MapPin size={17} />
+                                    )}
+                                    <span style={{ textTransform: "capitalize" }}>
+                                        {appointment.consultationType} Consultation
+                                    </span>
+                                </div>
                             </div>
 
-                            <div>
-                                {appointment.type ===
-                                    "Video Consultation" ? (
-                                    <Video size={17} />
-                                ) : (
-                                    <MapPin size={17} />
-                                )}
-
-                                <span>
-                                    {appointment.type}
-                                </span>
-                            </div>
-
-                        </div>
-
-                        {/* Status + Action */}
-                        <div className="appointment-actions">
-
-                            <div
-                                className={`appointment-status ${appointment.status ===
-                                    "Confirmed"
-                                    ? "confirmed"
-                                    : "completed"
+                            {/* Status + Action */}
+                            <div className="appointment-actions">
+                                <div
+                                    className={`appointment-status ${
+                                        appointment.status === "cancelled"
+                                            ? "cancelled"
+                                            : appointment.status === "completed"
+                                            ? "completed"
+                                            : "confirmed"
                                     }`}
-                            >
-                                {appointment.status ===
-                                    "Confirmed" ? (
-                                    <CheckCircle2 size={15} />
-                                ) : (
-                                    <CheckCircle2 size={15} />
+                                >
+                                    {appointment.status === "cancelled" ? (
+                                        <XCircle size={15} />
+                                    ) : (
+                                        <CheckCircle2 size={15} />
+                                    )}
+                                    <span style={{ textTransform: "capitalize" }}>{appointment.status}</span>
+                                </div>
+
+                                {(appointment.status === "upcoming" || appointment.status === "confirmed") && (
+                                    <div style={{ display: "flex", gap: "8px" }}>
+                                        <button
+                                            className="join-button"
+                                            onClick={() =>
+                                                navigate("/patient/consultation", {
+                                                    state: { appointment },
+                                                })
+                                            }
+                                        >
+                                            <Video size={16} />
+                                            Join
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCancel(appointment.id)}
+                                            style={{
+                                                padding: "6px 12px",
+                                                border: "1px solid var(--gray-300)",
+                                                borderRadius: "var(--radius)",
+                                                background: "var(--white)",
+                                                color: "var(--danger)",
+                                                fontSize: "12px",
+                                                fontWeight: 600,
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 )}
 
-                                {appointment.status}
-                            </div>
-
-                            {appointment.status ===
-                                "Confirmed" && (
+                                {appointment.status === "completed" && (
                                     <button
-                                        className="join-button"
-                                        onClick={() =>
-                                            navigate(
-                                                "/patient/consultation"
-                                            )
-                                        }
+                                        className="view-button"
+                                        onClick={() => navigate("/patient/prescriptions")}
                                     >
-                                        <Video size={16} />
-                                        Join
-                                    </button>
-                                )}
-
-                            {appointment.status ===
-                                "Completed" && (
-                                    <button className="view-button">
-                                        View Details
+                                        View Prescription
                                         <ArrowRight size={15} />
                                     </button>
                                 )}
-
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
+            )}
 
-            </div>
-
-            {/* Empty state if needed */}
-            {appointments.length === 0 && (
+            {/* Empty state */}
+            {!loading && displayedAppointments.length === 0 && (
                 <div className="appointments-empty">
                     <UserRound size={40} />
                     <h2>No appointments found</h2>
-                    <p>
-                        You don't have any appointments in
-                        this section.
-                    </p>
-
-                    <button
-                        onClick={() =>
-                            navigate("/patient/find-doctor")
-                        }
-                    >
+                    <p>You don't have any {activeTab.toLowerCase()} appointments scheduled.</p>
+                    <button onClick={() => navigate("/patient/find-doctor")}>
                         Find a Doctor
                     </button>
                 </div>
